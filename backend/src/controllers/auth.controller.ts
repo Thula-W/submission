@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import prisma from '../config/prisma';
-import { generateTokens, generateRandomPassword } from '../utils/token';
+import {generateTokens, generateRandomPassword, setRefreshCookie, clearRefreshCookie, REFRESH_COOKIE_NAME} from '../utils/token';
 
 export const registerCustomer = async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -14,15 +15,8 @@ export const registerCustomer = async (req: Request, res: Response) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
     const customer = await prisma.customer.create({
-      data: {
-        email,
-        passwordHash,
-      },
-      select: {
-        id: true,
-        email: true,
-        createdAt: true,
-      },
+      data: { email, passwordHash },
+      select: { id: true, email: true, createdAt: true },
     });
 
     return res.status(201).json({ message: 'Customer registered successfully', customer });
@@ -45,9 +39,17 @@ export const customerLogin = async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const tokens = generateTokens({ userId: customer.id, role: 'CUSTOMER' });
+    const { accessToken, refreshToken } = generateTokens({
+      userId: customer.id,
+      role: 'CUSTOMER',
+    });
 
-    return res.status(200).json(tokens);
+    setRefreshCookie(res, refreshToken);
+
+    return res.status(200).json({
+      accessToken,
+      user: { id: customer.id, email: customer.email, role: 'CUSTOMER' },
+    });
   } catch (error) {
     return res.status(500).json({ message: 'Error during login' });
   }
@@ -67,12 +69,66 @@ export const adminLogin = async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    const tokens = generateTokens({ userId: admin.id, role: 'ADMIN' });
+    const { accessToken, refreshToken } = generateTokens({
+      userId: admin.id,
+      role: 'ADMIN',
+    });
 
-    return res.status(200).json(tokens);
+    setRefreshCookie(res, refreshToken);
+
+    return res.status(200).json({
+      accessToken,
+      user: { id: admin.id, email: admin.email, role: 'ADMIN', isSuperAdmin: admin.isSuperAdmin },
+    });
   } catch (error) {
     return res.status(500).json({ message: 'Error during login' });
   }
+};
+
+export const refreshAccessToken = async (req: Request, res: Response) => {
+  // Read refresh token from the cookie
+  const refreshToken = req.cookies[REFRESH_COOKIE_NAME];
+
+  if (!refreshToken) {
+    return res.status(401).json({ message: 'Refresh token missing in cookies' });
+  }
+
+  const refreshSecret = process.env.JWT_REFRESH_SECRET || 'refresh_secret';
+
+  try {
+    const decoded = jwt.verify(refreshToken, refreshSecret) as {
+      userId: string;
+      role: 'CUSTOMER' | 'ADMIN';
+    };
+
+    let userExists = false;
+    if (decoded.role === 'CUSTOMER') {
+      const customer = await prisma.customer.findUnique({ where: { id: decoded.userId } });
+      userExists = !!customer;
+    } else if (decoded.role === 'ADMIN') {
+      const admin = await prisma.admin.findUnique({ where: { id: decoded.userId } });
+      userExists = !!admin;
+    }
+
+    if (!userExists) {
+      clearRefreshCookie(res);
+      return res.status(401).json({ message: 'User no longer exists' });
+    }
+
+    // Issue a fresh access token and rotate the refresh token
+    const tokens = generateTokens({ userId: decoded.userId, role: decoded.role });
+    setRefreshCookie(res, tokens.refreshToken);
+
+    return res.status(200).json({ accessToken: tokens.accessToken });
+  } catch (error) {
+    clearRefreshCookie(res);
+    return res.status(403).json({ message: 'Expired or invalid refresh token' });
+  }
+};
+
+export const logout = async (_req: Request, res: Response) => {
+  clearRefreshCookie(res);
+  return res.status(200).json({ message: 'Logged out successfully' });
 };
 
 export const createAdmin = async (req: Request, res: Response) => {
