@@ -306,7 +306,7 @@ npm run  seed
   * `lastName`: Non-empty string.
   * `email`: Valid email format, unique per submission.
   * `gender`: Must be `MALE`, `FEMALE`, or `OTHER`.
-  * `mobileNumber`: Valid mobile number (digits and optional leading `+`, 7–15 chars).
+  * `mobileNumber`: Valid mobile number. (Either 10 digits starting with 0 (e.g., 0712345678) or 11 digits starting with + (e.g., +94712345678))
   * `address`: Non-empty string.
   * `feedback`: Optional string.
 * **Request Body:**
