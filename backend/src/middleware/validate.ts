@@ -11,10 +11,7 @@ export const validate =
       if (error instanceof ZodError) {
         return res.status(400).json({
           status: 'error',
-          errors: error.errors.map((err) => ({
-            field: err.path.join('.'),
-            message: err.message,
-          })),
+          message: error.message,
         });
       }
       return res.status(500).json({ message: 'Internal server error' });

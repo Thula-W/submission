@@ -1,0 +1,6 @@
+{
+  "name": "Customer Portal & Admin Dashboard",
+  "description": "Full-stack customer application portal and administrative dashboard with secure authentication, role-based access control, and submission management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
