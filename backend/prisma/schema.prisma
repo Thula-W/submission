@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum SubmissionStatus {
+  PENDING
+  REVIEWED
+  APPROVED
+  ARCHIVED
+}
+
+model Customer {
+  id                String       @id @default(uuid())
+  email             String       @unique
+  passwordHash      String
+  createdAt         DateTime     @default(now())
+  createdSubmissions Submission[] @relation("SubmissionCreatedByCustomer")
+}
+
+model Admin {
+  id                String       @id @default(uuid())
+  email             String       @unique
+  passwordHash      String
+  isSuperAdmin      Boolean      @default(false)
+  createdAt         DateTime     @default(now())
+  modifiedSubmissions Submission[] @relation("SubmissionModifiedByAdmin")
+
+}
+
+model Submission {
+  id              String    @id @default(uuid())
+  firstName       String
+  lastName        String
+  email           String
+  gender          Gender
+  status          SubmissionStatus @default(PENDING)
+  mobileNumber    String
+  address         String
+  feedback        String?
+  customerCreatedId String
+  dateCreated     DateTime  @default(now())
+  adminModifiedId  String?
+  dateModified    DateTime?
+  customerCreated Customer  @relation("SubmissionCreatedByCustomer", fields: [customerCreatedId], references: [id])
+  adminModified   Admin?     @relation("SubmissionModifiedByAdmin", fields: [adminModifiedId], references: [id])
+
+  @@index([gender])
+  @@index([lastName, firstName])
+}
