@@ -86,7 +86,6 @@ export const adminLogin = async (req: Request, res: Response) => {
 };
 
 export const refreshAccessToken = async (req: Request, res: Response) => {
-  // Read refresh token from the cookie
   const refreshToken = req.cookies[REFRESH_COOKIE_NAME];
 
   if (!refreshToken) {
@@ -115,7 +114,6 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
       return res.status(401).json({ message: 'User no longer exists' });
     }
 
-    // Issue a fresh access token and rotate the refresh token
     const tokens = generateTokens({ userId: decoded.userId, role: decoded.role });
     setRefreshCookie(res, tokens.refreshToken);
 
