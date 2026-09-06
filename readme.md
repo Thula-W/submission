@@ -1,13 +1,13 @@
-# Full-Stack Application - Backend API
+# Full-Stack Application
 
-A RESTful API built with Node.js, Express.js, TypeScript, PostgreSQL, and Prisma. The service features JWT-based role authentication (`CUSTOMER` and `ADMIN`), customer form submissions, and administrative management capabilities with filtering and search.
+Built with React, Node.js, Express.js, TypeScript, PostgreSQL, and Prisma. The service features JWT-based role authentication (`CUSTOMER` and `ADMIN`), customer form submissions, and administrative management capabilities with filtering and search.
 
 ---
 
 ## Tech Stack
 
-* **Runtime:** Node.js
-* **Framework:** Express.js
+* **Backend:** Node.js, Express.js
+* **Frontend:** React
 * **Language:** TypeScript
 * **Database:** PostgreSQL
 * **ORM:** Prisma
@@ -16,7 +16,7 @@ A RESTful API built with Node.js, Express.js, TypeScript, PostgreSQL, and Prisma
 
 ---
 
-## Project Structure
+## Project Structure - Backend
 
 ```text
 backend/
@@ -56,7 +56,7 @@ backend/
 * Node.js (v18 or higher)
 * PostgreSQL running locally or via a cloud instance
 
-### 1. Installation
+### 1. Installation (Backend)
 
 Clone the repository and install all dependencies:
 
@@ -67,7 +67,7 @@ npm install
 
 ### 2. Environment Configuration
 
-Copy `.env.example` to `.env` in the root of the `backend` folder:
+Copy `.env.example` to `.env` in the  `backend` folder:
 
 Define the required variables:
 
@@ -109,6 +109,26 @@ npm run  seed
   npm run build
   npm start
   ```
+
+### 5. Installation (Frontend)
+
+Install all dependencies:
+
+```bash
+cd frontend
+npm install
+```
+
+### 6. Environment Configuration
+
+Copy `.env.example` to `.env` in the  `frontend` folder:
+
+Define the required variables:
+
+### 7. Run
+```bash
+npm run dev
+```
 
 ---
 
