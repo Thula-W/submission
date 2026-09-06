@@ -1,8 +1,21 @@
-# Full-Stack Application
+# Clientel - Full-Stack Application
 
-Built with React, Node.js, Express.js, TypeScript, PostgreSQL, and Prisma. The service features JWT-based role authentication (`CUSTOMER` and `ADMIN`), customer form submissions, and administrative management capabilities with filtering and search.
+> A robust, role-secured platform built with modern TypeScript tooling, featuring granular JWT authentication, customer data intake, and an administrative dashboard.
 
 ---
+
+## Highlights
+
+* **Role-Based Access Control (RBAC):** Distinct customer and admin workflows enforced via JWT access and refresh token lifecycles.
+* **Server-Side Validation:** Rigid schema checks on customer entries with audit tracking (`userCreated`, `userModified`, timestamps).
+* **Interactive Admin Suite:** Live multi-param search (first/last name) and gender-based filtering, backed by full CRUD operations.
+* **Type-Safe Persistence:** PostgreSQL managed through Prisma ORM for type safety from database to API handler.
+---
+# Test Credentials
+| Role | Email | Password |
+| :--- | :--- | :--- |
+| **Admin** | `admin@example.com` | `pass123` |
+| **Customer** | `customer@example.com` | `customer123` |
 
 ## Tech Stack
 
@@ -92,12 +105,6 @@ Seed the database with the initial Super Admin, customer and 5 submissions:
 npm run  seed
 ```
 
-* **Default Admin Email:** `dmin@example.com`
-* **Default Admin Password:** `pass123`
-
-* **Default Customer Email:** `customer@example.com`
-* **Default Customer Password:** `customer123`
-  
 ### 4. Running the Server
 
 * **Development Mode (Hot-reload):**
